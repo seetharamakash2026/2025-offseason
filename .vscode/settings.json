@@ -14,6 +14,10 @@
     "**/.factorypath": true,
     "**/*~": true
   },
+  "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/Users/akashseetharam/Downloads/Jama-1.0.3.jar"
+    ],
   "java.test.config": [
     {
       "name": "WPIlibUnitTests",
