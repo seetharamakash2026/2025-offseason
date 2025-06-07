@@ -25,7 +25,7 @@ public class GremlinLogger extends DogLog {
     private static final NetworkTable debugTable = ntInstance.getTable("Debug");
     private static final NetworkTableEntry debugEntry = debugTable.getEntry("Enabled");
 
-    public static boolean DEBUG = false;
+    public static boolean DEBUG = true;
     private static Notifier debugNotifier;
 
     static {

@@ -2,34 +2,45 @@ package frc.robot.Subsystems;
 
 import com.ctre.phoenix.sensors.CANCoderSimCollection;
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.CANcoderSimState;
+import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
-
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.commons.GremlinLogger;
+import frc.robot.commons.GremlinUtil;
 import frc.robot.commons.GremlinLogger;
 
 import swervelib.encoders.CanAndMagSwerve;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.lang.Thread.State;
 import java.util.function.DoubleSupplier;
 
 import org.opencv.dnn.Model;
@@ -38,26 +49,28 @@ public class Intake extends SubsystemBase{
         @SuppressWarnings("unused")
         private TalonFX frontMotor = new TalonFX(IntakeConstants.frontMotorID, IntakeConstants.CAN_STRING);
         private TalonFX backMotor = new TalonFX(IntakeConstants.backMotorID, IntakeConstants.CAN_STRING);
-        private CANcoder backCancoder = new CanAndMagSwerve(IntakeConstants.backCancoderID, IntakeConstants.CAN_STRING)
+        private CANcoder backCancoder = new CANcoder(IntakeConstants.backCancoderId, IntakeConstants.CAN_STRING);
 
         private double targetAngleDegrees; 
         private double voltage;
 
-        public Trigger atTargetAngle = new Trigger(() -> atTargetAngle()); // define
+        public Trigger atTargetAngle = new Trigger(() -> atTargetAngle()); 
 
         public Intake() {
-            configDevices(); // define
+            configDevices(); 
 
             if (Utils.isSimulation()) {
-                configSimulation(); // define
+                configSimulation(); 
             }
 
-            targetAngleDegrees = getAngleDegrees(); // define
+            targetAngleDegrees = getAngleDegrees(); 
         }
 
         // configures everything and zeroes
-        public void configDevides() {
-            backMotor.getConfigurator().apply(IntakeConstants.backMotorConfig); // create
+        public void configDevices() {
+            frontMotor.getConfigurator().apply(IntakeConstants.frontMotorConfig); 
+            backMotor.getConfigurator().apply(IntakeConstants.pivotMotorConfig); 
+            backCancoder.getConfigurator().apply(IntakeConstants.pivotCancoderConfig);
 
             backMotor.clearStickyFaults();
             frontMotor.clearStickyFaults();
@@ -85,12 +98,16 @@ public class Intake extends SubsystemBase{
             return edu.wpi.first.math.util.Units.rotationsToDegrees(backCancoder.getPosition().getValueAsDouble());
         }
 
+        public double getAngleRadians() {
+            return edu.wpi.first.math.util.Units.rotationsToRadians(backCancoder.getPosition().getValueAsDouble());
+        }
+
         public boolean atTargetAngle() {
-            return Math.abs(getAngleDegrees() - targetAngleDegrees) < IntakeConstants.angleToleranceDegrees; // create
+            return Math.abs(getAngleDegrees() - targetAngleDegrees) < IntakeConstants.angleToleranceDegrees; 
         }
         
         private void setAngleTargetDegrees(double targetAngleDegrees) {
-            this.targetAngleDegrees = GremlinUtil.clampWithLogs(IntakeConstants.maxAngle, IntakeConstants.minAngle, targetAngleDegrees); // create
+            this.targetAngleDegrees = GremlinUtil.clampWithLogs(IntakeConstants.maxAngle, IntakeConstants.minAngle, targetAngleDegrees); 
             
             double targetAngleRotations = edu.wpi.first.math.util.Units.degreesToRotations(targetAngleDegrees);
 
@@ -109,15 +126,19 @@ public class Intake extends SubsystemBase{
                 setAngleTargetDegrees(angle.getAsDouble());
             }).until(atTargetAngle);
         }
+        public Command goToAngleDegrees(double angle) {
+            return this.run(() -> {
+                setAngleTargetDegrees(angle);
+            }).until(atTargetAngle);
+        }
         
         public Command stow() {
-            return goToAngleDegrees(IntakeConstants.minAngle); // create
+            return goToAngleDegrees(IntakeConstants.minAngle); 
         }
 
         public Command activateForCoral() {
-            return goToAngleDegrees(IntakeConstants.maxAngle); // create
+            return goToAngleDegrees(IntakeConstants.maxAngle); 
         }
-
         /*
          * Voltage and Current
          */
@@ -192,7 +213,7 @@ public class Intake extends SubsystemBase{
 
         @Override
         public void periodic() {
-            updateMechanism2d(); // define
+            updateMechanism2d(); 
 
             SmartDashboard.putNumber("pivot angle", getAngleDegrees());
             SmartDashboard.putBoolean("rarely is the question asked, is our children spinning?", spinning());
@@ -217,24 +238,118 @@ public class Intake extends SubsystemBase{
 
         // sim
         private final FlywheelSim flywheelSim = new FlywheelSim(
-            DCMotor.getKrakenX60Foc(0),
-            IntakeConstants.flywheelGearing // create
+            LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60(1), IntakeConstants.flywheelMOI, IntakeConstants.flywheelGearing),
+            DCMotor.getKrakenX60(1)
         );
         private final SingleJointedArmSim singleJointedArmSim = new SingleJointedArmSim(
             DCMotor.getKrakenX60(1),
-            IntakeConstants.pivotGearing, // create
-            IntakeConstants.pivotMOI, // create
-            IntakeConstants.intakeLength, // create 
-            edu.wpi.first.math.util.Units.degreesToRadians(IntakeConstants.minAngle), // create
-            edu.wpi.first.math.util.Units.degreesToRadians(IntakeConstants.maxAngle), // create
+            IntakeConstants.pivotTotalGearing, 
+            IntakeConstants.pivotMOI, 
+            IntakeConstants.intakeLength,  
+            edu.wpi.first.math.util.Units.degreesToRadians(IntakeConstants.minAngle),
+            edu.wpi.first.math.util.Units.degreesToRadians(IntakeConstants.maxAngle), 
             true, 
-            edu.wpi.first.math.util.Units.degreesToRadians(IntakeConstants.minAngle), // create 
+            edu.wpi.first.math.util.Units.degreesToRadians(IntakeConstants.minAngle), 
             null);
         
         private TalonFXSimState frontMotorSim;
         private TalonFXSimState backMotorSim;
         private CANcoderSimState backCancoderSim;
 
-        private Mechanism2d pivotMech = new Mechanism2d(IntakeConstants.canvasWidth, IntakeConstants.canvasHeight) // create x2
+        private Mechanism2d pivotMech = new Mechanism2d(IntakeConstants.canvasWidth, IntakeConstants.canvasHeight); 
+        private StructArrayPublisher<Pose3d> componentPosesPublisher = NetworkTableInstance.getDefault()
+            .getTable(IntakeConstants.intakeTable)
+            .getStructArrayTopic("componentPoses", Pose3d.struct).publish();
         
+        private MechanismRoot2d pivotRoot = pivotMech.getRoot(("pivotRoot"), 2, 3); // I don't know what the 2 and 3 are for I think they might just be replaced
+        private MechanismLigament2d pivotLigament = pivotRoot.append(
+            new MechanismLigament2d("pivotLigament", IntakeConstants.intakeLength, IntakeConstants.minAngle) 
+        ); 
+
+        public void configSimulation() {
+            frontMotorSim = frontMotor.getSimState();
+            backMotorSim = backMotor.getSimState();
+            backCancoderSim = backCancoder.getSimState();
+
+            frontMotorSim.Orientation = ChassisReference.CounterClockwise_Positive;
+            backMotorSim.Orientation = ChassisReference.CounterClockwise_Positive; // be ready to fix these
+
+            singleJointedArmSim.setState(0, 0);
+        }
+
+        @Override
+        public void simulationPeriodic() {
+            frontMotorSim = frontMotor.getSimState();
+            backMotorSim = backMotor.getSimState();
+            backCancoderSim = backCancoder.getSimState();
+
+            frontMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+            backCancoderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+            backMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+
+            flywheelSim.setInputVoltage(frontMotorSim.getMotorVoltageMeasure().in(Volts));
+            flywheelSim.update(0.02);
+
+            singleJointedArmSim.setInputVoltage(backMotorSim.getMotorVoltageMeasure().in(Volts));
+            singleJointedArmSim.update(0.02);
+
+
+            backCancoderSim.setRawPosition(edu.wpi.first.math.util.Units.radiansToRotations((singleJointedArmSim.getAngleRads() * IntakeConstants.pivotSensorToMechanismRatio))); 
+            backCancoderSim.setVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * IntakeConstants.pivotSensorToMechanismRatio)); 
+            backMotorSim.setRawRotorPosition(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getAngleRads() * IntakeConstants.pivotTotalGearing));
+            backMotorSim.setRotorVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * IntakeConstants.pivotTotalGearing));
+            
+            updateMechanism2d();
+        
+        }
+
+        public void updateMechanism2d() {
+            double currentAngle = getAngleDegrees();
+
+            if (GremlinLogger.DEBUG) { // ON BY DEFAULT
+                pivotLigament.setAngle(180 - currentAngle); // I have a vague idea of what this is for
+
+                componentPosesPublisher.set(new Pose3d[] {
+                    new Pose3d(IntakeConstants.pivotOffsetX, 
+                                IntakeConstants.pivotOffsetY, 
+                                IntakeConstants.pivotOffsetZ, 
+                                new Rotation3d(0, 
+                                                -getAngleRadians(), // same reason as the 180 - probably
+                                                0))
+                });
+            }
+
+            GremlinLogger.log("Intake/Pivot", new Pose3d[] {
+                new Pose3d(IntakeConstants.pivotOffsetX, 
+                            IntakeConstants.pivotOffsetY,
+                            IntakeConstants.pivotOffsetZ, 
+                            new Rotation3d(0, 
+                                            -getAngleRadians(), // same reason as the 180 - probably
+                                            0))
+            });
+        }
+
+        private final SysIdRoutine m_SysIdRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(
+                Volts.of(0.5).per(Second),
+                Volts.of(2),
+                null,
+                (state) -> SignalLogger.writeString("state", state.toString())
+            ),
+            new SysIdRoutine.Mechanism(
+                (volts) -> {
+                    backMotor.setVoltage((volts.in(Volts)));
+                }, 
+                null, 
+                this)
+            );
+                
+        
+            // possibly redundant
+            public Command sysIdQuasistatic(SysIdRoutine.Direction d) {
+                return m_SysIdRoutine.quasistatic(d);
+            }
+            public Command sysIdDynamic(SysIdRoutine.Direction d) {
+                return m_SysIdRoutine.dynamic(d);
+            }
 }
