@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.IntakeConstants;
+import static frc.robot.Constants.IntakeConstants.*;
 import frc.robot.commons.GremlinLogger;
 import frc.robot.commons.GremlinUtil;
 import frc.robot.commons.GremlinLogger;
@@ -47,9 +47,9 @@ import org.opencv.dnn.Model;
 
 public class Intake extends SubsystemBase{
         @SuppressWarnings("unused")
-        private TalonFX frontMotor = new TalonFX(IntakeConstants.frontMotorID, IntakeConstants.CAN_STRING);
-        private TalonFX backMotor = new TalonFX(IntakeConstants.backMotorID, IntakeConstants.CAN_STRING);
-        private CANcoder backCancoder = new CANcoder(IntakeConstants.backCancoderId, IntakeConstants.CAN_STRING);
+        private TalonFX frontMotor = new TalonFX(frontMotorID, CAN_STRING);
+        private TalonFX backMotor = new TalonFX(backMotorID, CAN_STRING);
+        private CANcoder backCancoder = new CANcoder(backCancoderId, CAN_STRING);
 
         private double targetAngleDegrees; 
         private double voltage;
@@ -68,9 +68,9 @@ public class Intake extends SubsystemBase{
 
         // configures everything and zeroes
         public void configDevices() {
-            frontMotor.getConfigurator().apply(IntakeConstants.frontMotorConfig); 
-            backMotor.getConfigurator().apply(IntakeConstants.pivotMotorConfig); 
-            backCancoder.getConfigurator().apply(IntakeConstants.pivotCancoderConfig);
+            frontMotor.getConfigurator().apply(frontMotorConfig); 
+            backMotor.getConfigurator().apply(pivotMotorConfig); 
+            backCancoder.getConfigurator().apply(pivotCancoderConfig);
 
             backMotor.clearStickyFaults();
             frontMotor.clearStickyFaults();
@@ -103,11 +103,11 @@ public class Intake extends SubsystemBase{
         }
 
         public boolean atTargetAngle() {
-            return Math.abs(getAngleDegrees() - targetAngleDegrees) < IntakeConstants.angleToleranceDegrees; 
+            return Math.abs(getAngleDegrees() - targetAngleDegrees) < angleToleranceDegrees; 
         }
         
         private void setAngleTargetDegrees(double targetAngleDegrees) {
-            this.targetAngleDegrees = GremlinUtil.clampWithLogs(IntakeConstants.maxAngle, IntakeConstants.minAngle, targetAngleDegrees); 
+            this.targetAngleDegrees = GremlinUtil.clampWithLogs(maxAngle, minAngle, targetAngleDegrees); 
             
             double targetAngleRotations = edu.wpi.first.math.util.Units.degreesToRotations(targetAngleDegrees);
 
@@ -133,11 +133,11 @@ public class Intake extends SubsystemBase{
         }
         
         public Command stow() {
-            return goToAngleDegrees(IntakeConstants.minAngle); 
+            return goToAngleDegrees(minAngle); 
         }
 
         public Command activateForCoral() {
-            return goToAngleDegrees(IntakeConstants.maxAngle); 
+            return goToAngleDegrees(maxAngle); 
         }
         /*
          * Voltage and Current
@@ -238,32 +238,32 @@ public class Intake extends SubsystemBase{
 
         // sim
         private final FlywheelSim flywheelSim = new FlywheelSim(
-            LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60(1), IntakeConstants.flywheelMOI, IntakeConstants.flywheelGearing),
+            LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60(1), flywheelMOI, flywheelGearing),
             DCMotor.getKrakenX60(1)
         );
         private final SingleJointedArmSim singleJointedArmSim = new SingleJointedArmSim(
             DCMotor.getKrakenX60(1),
-            IntakeConstants.pivotTotalGearing, 
-            IntakeConstants.pivotMOI, 
-            IntakeConstants.intakeLength,  
-            edu.wpi.first.math.util.Units.degreesToRadians(IntakeConstants.minAngle),
-            edu.wpi.first.math.util.Units.degreesToRadians(IntakeConstants.maxAngle), 
+            pivotTotalGearing, 
+            pivotMOI, 
+            intakeLength,  
+            edu.wpi.first.math.util.Units.degreesToRadians(minAngle),
+            edu.wpi.first.math.util.Units.degreesToRadians(maxAngle), 
             true, 
-            edu.wpi.first.math.util.Units.degreesToRadians(IntakeConstants.minAngle), 
-            null);
+            edu.wpi.first.math.util.Units.degreesToRadians(minAngle)
+            );
         
         private TalonFXSimState frontMotorSim;
         private TalonFXSimState backMotorSim;
         private CANcoderSimState backCancoderSim;
 
-        private Mechanism2d pivotMech = new Mechanism2d(IntakeConstants.canvasWidth, IntakeConstants.canvasHeight); 
+        private Mechanism2d pivotMech = new Mechanism2d(canvasWidth, canvasHeight); 
         private StructArrayPublisher<Pose3d> componentPosesPublisher = NetworkTableInstance.getDefault()
-            .getTable(IntakeConstants.intakeTable)
+            .getTable(intakeTable)
             .getStructArrayTopic("componentPoses", Pose3d.struct).publish();
         
         private MechanismRoot2d pivotRoot = pivotMech.getRoot(("pivotRoot"), 2, 3); // I don't know what the 2 and 3 are for I think they might just be replaced
         private MechanismLigament2d pivotLigament = pivotRoot.append(
-            new MechanismLigament2d("pivotLigament", IntakeConstants.intakeLength, IntakeConstants.minAngle) 
+            new MechanismLigament2d("pivotLigament", intakeLength, minAngle) 
         ); 
 
         public void configSimulation() {
@@ -294,10 +294,10 @@ public class Intake extends SubsystemBase{
             singleJointedArmSim.update(0.02);
 
 
-            backCancoderSim.setRawPosition(edu.wpi.first.math.util.Units.radiansToRotations((singleJointedArmSim.getAngleRads() * IntakeConstants.pivotSensorToMechanismRatio))); 
-            backCancoderSim.setVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * IntakeConstants.pivotSensorToMechanismRatio)); 
-            backMotorSim.setRawRotorPosition(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getAngleRads() * IntakeConstants.pivotTotalGearing));
-            backMotorSim.setRotorVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * IntakeConstants.pivotTotalGearing));
+            backCancoderSim.setRawPosition(edu.wpi.first.math.util.Units.radiansToRotations((singleJointedArmSim.getAngleRads() * pivotSensorToMechanismRatio))); 
+            backCancoderSim.setVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotSensorToMechanismRatio)); 
+            backMotorSim.setRawRotorPosition(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getAngleRads() * pivotTotalGearing));
+            backMotorSim.setRotorVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotTotalGearing));
             
             updateMechanism2d();
         
@@ -310,9 +310,9 @@ public class Intake extends SubsystemBase{
                 pivotLigament.setAngle(180 - currentAngle); // I have a vague idea of what this is for
 
                 componentPosesPublisher.set(new Pose3d[] {
-                    new Pose3d(IntakeConstants.pivotOffsetX, 
-                                IntakeConstants.pivotOffsetY, 
-                                IntakeConstants.pivotOffsetZ, 
+                    new Pose3d(pivotOffsetX, 
+                                pivotOffsetY, 
+                                pivotOffsetZ, 
                                 new Rotation3d(0, 
                                                 -getAngleRadians(), // same reason as the 180 - probably
                                                 0))
@@ -320,9 +320,9 @@ public class Intake extends SubsystemBase{
             }
 
             GremlinLogger.log("Intake/Pivot", new Pose3d[] {
-                new Pose3d(IntakeConstants.pivotOffsetX, 
-                            IntakeConstants.pivotOffsetY,
-                            IntakeConstants.pivotOffsetZ, 
+                new Pose3d(pivotOffsetX, 
+                            pivotOffsetY,
+                            pivotOffsetZ, 
                             new Rotation3d(0, 
                                             -getAngleRadians(), // same reason as the 180 - probably
                                             0))
@@ -345,11 +345,11 @@ public class Intake extends SubsystemBase{
             );
                 
         
-            // possibly redundant
-            public Command sysIdQuasistatic(SysIdRoutine.Direction d) {
-                return m_SysIdRoutine.quasistatic(d);
-            }
-            public Command sysIdDynamic(SysIdRoutine.Direction d) {
-                return m_SysIdRoutine.dynamic(d);
-            }
+        // possibly redundant
+        public Command sysIdQuasistatic(SysIdRoutine.Direction d) {
+            return m_SysIdRoutine.quasistatic(d);
+        }
+        public Command sysIdDynamic(SysIdRoutine.Direction d) {
+            return m_SysIdRoutine.dynamic(d);
+        }
 }
