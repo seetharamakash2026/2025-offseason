@@ -30,7 +30,7 @@ public class PathfindCommand extends Command {
     PathfindCommandConstants.kMaxVelError // Goal end velocity in meters/sec
   );
 
-  private static Pose2d m_targetPose = new Pose2d();
+  private Pose2d m_targetPose = new Pose2d();
 
   AutoBuilder m_AutoBuilder = new AutoBuilder();
   public PathfindCommand(CommandSwerveDrivetrain drivetrainRef, Pose2d targetPose) {
