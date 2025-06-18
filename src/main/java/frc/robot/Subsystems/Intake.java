@@ -1,4 +1,4 @@
-package frc.robot.Subsystems;
+package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoderSimCollection;
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.IntakeConstants;
+import frc.robot.constants.IntakeConstants;
 import frc.robot.commons.GremlinLogger;
 import frc.robot.commons.GremlinUtil;
 import frc.robot.commons.GremlinLogger;

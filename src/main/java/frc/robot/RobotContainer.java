@@ -13,9 +13,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.IntakeConstants;
+import frc.robot.constants.IntakeConstants;
 import frc.robot.RobotState.DriveState;
-import frc.robot.Subsystems.Intake;
+import frc.robot.subsystems.Intake;
 import frc.robot.commons.GremlinLogger;
 import frc.robot.commons.GremlinPS4Controller;
 

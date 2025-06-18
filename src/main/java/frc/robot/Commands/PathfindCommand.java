@@ -6,6 +6,7 @@ package frc.robot.Commands;
 
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -16,10 +17,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.PathfindCommandConstants;
+import frc.robot.constants.DriveConstants;
+import frc.robot.constants.PathfindCommandConstants;
 //ALL SYNTAX ERRORS HERE WILL BE RESOLVED ONCE WE ACTUALLY ADD PHOENIXTUNER FILES
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.constants.DriveConstants;
+import frc.robot.generated.TunerConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class PathfindCommand extends Command {
@@ -43,11 +45,11 @@ public class PathfindCommand extends Command {
     }
     
     AutoBuilder.configure(
-      () -> {return m_DrivetrainRef.getState().Pose;},
-      (Pose2d pose) -> {m_DrivetrainRef.resetPose(pose);},
-      () -> {return m_DrivetrainRef.getState().Speeds;},
-      (ChassisSpeeds speeds, DriveFeedforwards feedForward) -> {drivetrainRef.driveRobotRelative(speeds);},
-      pathFollowingController,
+      () -> {return drivetrainRef.getState().Pose;},
+      (Pose2d pose) -> {drivetrainRef.resetPose(pose);},
+      () -> {return drivetrainRef.getState().Speeds;},
+      (ChassisSpeeds speeds, DriveFeedforwards feedForward) -> {drivetrainRef.driveRelativeSpeeds(speeds);},
+      DriveConstants.pathFollowingController,
       config,
       () -> {
         var alliance = DriverStation.getAlliance();
@@ -56,7 +58,7 @@ public class PathfindCommand extends Command {
         }
         return false;
       },
-      m_DrivetrainRef);
+      drivetrainRef);
   }
 
   // Called when the command is initially scheduled.
