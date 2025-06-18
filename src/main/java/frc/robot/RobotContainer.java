@@ -7,15 +7,21 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.constants.IntakeConstants;
+// import frc.robot.Constants.IntakeConstants;
+import frc.robot.generated.TunerConstants;
+import frc.robot.Commands.PathfindCommand;
 import frc.robot.RobotState.DriveState;
-import frc.robot.subsystems.Intake;
+import frc.robot.Subsystems.CommandSwerveDrivetrain;
+// import frc.robot.Subsystems.Intake;
 import frc.robot.commons.GremlinLogger;
 import frc.robot.commons.GremlinPS4Controller;
 
@@ -25,7 +31,9 @@ public class RobotContainer {
   private final GremlinPS4Controller joystick = new GremlinPS4Controller(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
   
-  public final Intake intake = new Intake();
+  // public final Intake intake = new Intake();
+
+  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
 
   public final Trigger intakeState = new Trigger(() -> M_ROBOT_STATE.getDriveState() == DriveState.INTAKE);
@@ -52,6 +60,9 @@ public class RobotContainer {
         Commands.runOnce(() -> M_ROBOT_STATE.setDriveState(DriveState.TELEOP)), 
         intakeState.negate()));
     
+    joystick.L1().onTrue(
+      new PathfindCommand(drivetrain, new Pose2d(new Translation2d(10, 0), new Rotation2d()))
+    );
 
   }
 
@@ -59,12 +70,12 @@ public class RobotContainer {
     return Commands.print("No autonomous command configured");
   }
 
-  public void registerPathPlannerCommands(){
-    NamedCommands.registerCommand("intake", 
-      intake.goToAngleDegrees(IntakeConstants.minAngle)
-        .andThen(intake.applyDownwardCurrentFront()) // could be upward who knows
-        //.andThen(Commands.waitUntil(nextMechanism.hasCoral?))
-        .andThen(intake.stow()).alongWith(intake.zeroCurrentFront())
-      );
-  }
+  // public void registerPathPlannerCommands(){
+  //   NamedCommands.registerCommand("intake", 
+  //     intake.goToAngleDegrees(IntakeConstants.minAngle)
+  //       .andThen(intake.applyDownwardCurrentFront()) // could be upward who knows
+  //       //.andThen(Commands.waitUntil(nextMechanism.hasCoral?))
+  //       .andThen(intake.stow()).alongWith(intake.zeroCurrentFront())
+  //     );
+  // }
 }
