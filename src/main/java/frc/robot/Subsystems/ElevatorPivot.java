@@ -58,7 +58,6 @@ public class ElevatorPivot extends SubsystemBase {
   private double targetAngleDegrees;
   private double voltage = 0;
 
-  private double stage3Height = carriageToGround;
   private double stage2Height = carriageToGround;
   private double carriageHeight = carriageToGround;
 
@@ -240,19 +239,14 @@ public class ElevatorPivot extends SubsystemBase {
     boolean travellingUpwards = travelingUpwards();
 
     // Update the max Heights
-    double stage3Top = stage3Height + stage3StageLength;
-    double stage2Top = stage2Height + stage2StageLength - stage3StageLength;
+    double stage2Top = stage2Height + stage2StageLength;
 
     // Logic to handle the position of the elevator stages
     if (travellingUpwards) {
-      if (carriageHeight < stage3Top) {
+      if (carriageHeight < stage2Top) {
         // Do Nothing, carriageHeight is just carriage Height
-      } else if (carriageHeight >= stage3Top && stage3Height < stage2Top) {
-        stage3Height = carriageHeight - stage3StageLength;
-        // Stage2Height remains the same
-      } else if (carriageHeight >= stage3Top && stage3Height >= stage2Top) {
-        stage3Height = carriageHeight - stage3StageLength;
-        stage2Height = carriageHeight - stage2StageLength - stage3StageLength;
+      } else if (carriageHeight >= stage2Top) {
+        stage2Height = carriageHeight - stage2StageLength;
       } else {
         try {
           throw new Exception("Something weird happened with the elevator sim heights");
@@ -261,12 +255,9 @@ public class ElevatorPivot extends SubsystemBase {
         }
       }
     } else {
-      if (carriageHeight > stage3Height) {
+      if (carriageHeight > stage2Height) {
         // Do nothing, hasnt hit the bottom yet
-      } else if (carriageHeight <= stage3Height && stage3Height > stage2Height) {
-        stage3Height = carriageHeight;
-      } else if (carriageHeight <= stage3Height && stage3Height <= stage2Height) {
-        stage3Height = carriageHeight;
+      }  else if (carriageHeight <= stage2Height) {
         stage2Height = carriageHeight;
       }
     }
@@ -281,7 +272,7 @@ public class ElevatorPivot extends SubsystemBase {
    * @param stage the stage outlined as above
    * @return the height of the stage in meters
    */
-  public double getStageHeight(int stage) {
+  public double getStageHeight(int stage) { // wherever this is called it might be broken
     updateStageHeights();
     switch (stage) {
       case 1:
@@ -289,8 +280,6 @@ public class ElevatorPivot extends SubsystemBase {
       case 2:
         return stage2Height;
       case 3:
-        return stage3Height;
-      case 4:
         return carriageHeight;
       default:
         return carriageHeight;
@@ -736,7 +725,6 @@ public class ElevatorPivot extends SubsystemBase {
 
     elevatorSim.setState(stowHeight, 0);
 
-    stage3Height = carriageToGround;
     stage2Height = carriageToGround;
     carriageHeight = carriageToGround;
   }
@@ -801,14 +789,13 @@ public class ElevatorPivot extends SubsystemBase {
     updateStageHeights();
 
     double carriageZ = carriageHeight - carriageToGround; // Same no matter what
-    double stage3Z = stage3Height - carriageToGround; // The heights of our stages are not the same as their z positions
+    // The heights of our stages are not the same as their z positions
     double stage2Z = stage2Height - carriageToGround;
 
     pivotLigament.setAngle(180 - currentAngle);
 
     componentPosesPublisher.set(new Pose3d[] {
         new Pose3d(0, 0, carriageZ, new Rotation3d()),
-        new Pose3d(0, 0, stage3Z, new Rotation3d()),
         new Pose3d(0, 0, stage2Z, new Rotation3d()),
         new Pose3d(pivotOffsetX, pivotOffsetY, carriageZ + pivotOffsetZ, new Rotation3d(0, -getPivotAngleRadians(), 0))
     });
