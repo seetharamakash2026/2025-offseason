@@ -78,6 +78,19 @@ public class ElevatorPivotConstants {
     public static final double travelAngle = maxUpperCollisionAngle - 10;
     public static final double stageToCarriageMax = 0.15;
     public static final double maxCollisionHeight = minimumHeight + 0.10;
+
+    // new collision numberes that I actually understand
+    public static final double coralOutcrop = Units.inchesToMeters(7); // has been rounded up
+    public static final double algaeOutcrop = Units.inchesToMeters(9.5);
+    public static final double highestBarrier = Units.inchesToMeters(0); // placeholder
+    // anthing above clear heights are allowed
+    public static final double nothingClearHeight = Units.inchesToMeters(7) + highestBarrier; 
+    public static final double coralClearHeight = coralOutcrop + highestBarrier;
+    public static final double algaeClearHeight = algaeOutcrop + highestBarrier;
+    // 
+    public static final double algaeTravelAngle = 90;
+    public static final double coralTravelAngle = -100; // use this if both as well maybe
+
     public static final double troughAngle = 6;
     public static final double bargeAngle = 70;
 

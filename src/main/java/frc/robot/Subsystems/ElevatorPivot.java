@@ -26,6 +26,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -43,7 +44,9 @@ import frc.robot.commons.GremlinUtil;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.ElevatorPivotConstants.*;
+import frc.robot.Subsystems.Claw;
 
+import java.text.CollationElementIterator;
 import java.util.function.DoubleSupplier;
 
 /* */
@@ -352,7 +355,7 @@ public class ElevatorPivot extends SubsystemBase {
    * @param heightMeters the final desired height in meters
    * @param angleDegrees the final desired angle in degrees
    */
-  private void setTargetHeightAndAngle(double heightMeters, double angleDegrees) {
+  private void setTargetHeightAndAngle(double heightMeters, double angleDegrees, Claw claw) {
     this.targetHeight = GremlinUtil.clampWithLogs(maxHeight, minimumHeight, heightMeters);
     this.targetAngleDegrees = GremlinUtil.clampWithLogs(maxAngleDegrees, minAngleDegrees, angleDegrees);
 
@@ -363,7 +366,7 @@ public class ElevatorPivot extends SubsystemBase {
     // GremlinLogger.debugLog("third", false);
     // GremlinLogger.debugLog("4th", false);
 
-    if (targetAngleDegrees > getPivotAngleDegrees()
+/*    if (targetAngleDegrees > getPivotAngleDegrees()
         && getPivotAngleDegrees() < maxUpperCollisionAngle && !hasAlgea()) {
       tempTargetAngle = travelAngle;
       tempTargetHeight = heightMeters;
@@ -387,7 +390,17 @@ public class ElevatorPivot extends SubsystemBase {
       tempTargetAngle = targetAngleDegrees;
       // GremlinLogger.debugLog("third", true);
     }
-
+ */
+    if (claw.hasAlgae() && getHeight() >= algaeClearHeight && heightMeters >= algaeClearHeight) {
+      tempTargetHeight = heightMeters;
+      tempTargetAngle = angleDegrees;
+    } else if (claw.hasCoral() && getHeight() >= coralClearHeight && heightMeters >= coralClearHeight) {
+      tempTargetHeight = heightMeters;
+      tempTargetAngle = angleDegrees;
+    } else if (!(claw.hasCoral() || claw.hasAlgae()) && getHeight() >= nothingClearHeight && heightMeters >= nothingClearHeight) {
+      tempTargetHeight = heightMeters;
+      tempTargetAngle = angleDegrees;
+    }
    
 
     GremlinLogger.debugLog("tempAngle", tempTargetAngle);
