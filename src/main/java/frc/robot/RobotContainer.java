@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 // import frc.robot.Constants.IntakeConstants;
 import frc.robot.generated.TunerConstants;
-import frc.robot.Commands.PathfindCommand;
 import frc.robot.RobotState.DriveState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain;
 // import frc.robot.Subsystems.Intake;
@@ -59,11 +58,6 @@ public class RobotContainer {
         Commands.runOnce(() -> M_ROBOT_STATE.setDriveState(DriveState.INTAKE)),
         Commands.runOnce(() -> M_ROBOT_STATE.setDriveState(DriveState.TELEOP)), 
         intakeState.negate()));
-    
-    joystick.L1().onTrue(
-      new PathfindCommand(drivetrain, new Pose2d(new Translation2d(10, 0), new Rotation2d()))
-    );
-
   }
 
   public Command getAutonomousCommand() {
