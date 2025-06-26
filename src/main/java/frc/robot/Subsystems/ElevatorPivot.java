@@ -358,7 +358,7 @@ public class ElevatorPivot extends SubsystemBase {
   private void setTargetHeightAndAngle(double heightMeters, double angleDegrees, Claw claw) {
     this.targetHeight = GremlinUtil.clampWithLogs(maxHeight, minimumHeight, heightMeters);
     this.targetAngleDegrees = GremlinUtil.clampWithLogs(maxAngleDegrees, minAngleDegrees, angleDegrees);
-
+    
     double tempTargetHeight = heightMeters;
     double tempTargetAngle = angleDegrees;
     // GremlinLogger.debugLog("first", false);

@@ -32,9 +32,9 @@ import edu.wpi.first.math.util.Units;
 
 /** Add your docs here. */
 public class ElevatorPivotConstants {
-    public static final int rightMotorId = 13;
-    public static final int leftMotorId = 12;
-    public static final int pivotMotorId = 14;
+    public static final int rightMotorId = 15;
+    public static final int leftMotorId = 14;
+    public static final int pivotMotorId = 13;
     public static final int pivotCancoderId = 16;
     public static final int canRangeId = 18;
     public static final String canbus = "Canivore 3045";
