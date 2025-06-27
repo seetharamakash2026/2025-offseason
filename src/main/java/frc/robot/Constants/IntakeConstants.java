@@ -19,8 +19,8 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.math.util.Units;
 
 public class IntakeConstants{
-    public static final int frontMotorID = 16;
-    public static final int backMotorID = 17; 
+    public static final int frontMotorID = 14;
+    public static final int backMotorID = 13; 
 
     public static final String CAN_STRING = "Canivore 3045";
     public static final int backCancoderId = 2;
