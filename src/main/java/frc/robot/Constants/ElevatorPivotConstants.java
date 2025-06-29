@@ -54,8 +54,9 @@ public class ElevatorPivotConstants {
     public static final double stowAngle = 0;
     public static final double intakingAngle = -90; // intaking coral
     public static final double processingAngle = -90;
-    public static final double algeaReadyAngle = -120;
-    public static final double algeaThrowAngle = -218;
+    public static final double algaeReadyAngle = -120;
+    public static final double algaeThrowAngle = -218;
+
 
     public static final double carriageToGround = Units.inchesToMeters(21.408345);// Units.inchesToMeters(16.752); //This is from the top of
                                                            // carriage to the ground, when at lowest position
@@ -68,16 +69,17 @@ public class ElevatorPivotConstants {
     public static final double bargeHeight = Units.inchesToMeters(62.17);
     public static final double troughHeight = minimumHeight;
     public static final double climbHeight = stowHeight;
-    public static final double algeaReadyHeight = minimumHeight + Units.inchesToMeters(30);
-    public static final double algeaThrowHeight = bargeHeight;
+    public static final double algaeReadyHeight = minimumHeight + Units.inchesToMeters(30);
+    public static final double algaeThrowHeight = bargeHeight;
 
     /* Collision */ // rewrite this
-    public static final double maxUpperCollisionAngle = 84;
-    public static final double maxAlgeaCollisionAngle = 20;
-    public static final double algeaTravelAngle = -120;
-    public static final double travelAngle = maxUpperCollisionAngle - 10;
+    // public static final double maxUpperCollisionAngle = 84;
+    // public static final double maxalgaeCollisionAngle = 20;
+    //public static final double coralTravelAngle = 
+    //public static final double algaeTravelAngle = 90;
+    //public static final double travelAngle = maxUpperCollisionAngle - 10;
     public static final double stageToCarriageMax = 0.15;
-    public static final double maxCollisionHeight = minimumHeight + 0.10;
+    //public static final double maxCollisionHeight = minimumHeight + 0.10;
 
     // new collision numberes that I actually understand
     public static final double coralOutcrop = Units.inchesToMeters(7); // has been rounded up
@@ -89,7 +91,7 @@ public class ElevatorPivotConstants {
     public static final double algaeClearHeight = algaeOutcrop + highestBarrier;
     // 
     public static final double algaeTravelAngle = 90;
-    public static final double coralTravelAngle = -100; // use this if both as well maybe
+    public static final double coralTravelAngle = -100; 
 
     public static final double troughAngle = 6;
     public static final double bargeAngle = 70;
@@ -97,11 +99,11 @@ public class ElevatorPivotConstants {
 
     public static final double rotorToSensorRatio = 1.0; // ?
     public static final double sensorToMechanismRatio = (3 / 1); 
-    public static final double totalGearing = rotorToSensorRatio * sensorToMechanismRatio;
+    public static final double totalgaering = rotorToSensorRatio * sensorToMechanismRatio;
 
     public static final double pivotRotorToSensorRatio = (48.0 / 10.0) * (64.0 / 18.0) * (48.0 / 18.0); // ?
     public static final double pivotSensorToMechanismRatio = 1;
-    public static final double pivotTotalGearing = pivotSensorToMechanismRatio * pivotRotorToSensorRatio;
+    public static final double pivotTotalgaering = pivotSensorToMechanismRatio * pivotRotorToSensorRatio;
 
     public static final double heightTolerance = 0.03; // 3cm
     public static final double angleToleranceDegrees = 5; // 3 degree tolerance
@@ -181,8 +183,8 @@ public class ElevatorPivotConstants {
         L2(Units.inchesToMeters(6.3)),
         L4_AUTO(Units.inchesToMeters(60.25)), // this may or may not be redundant
         L4_V2(1.92), // this may or may not be redundant
-        LOW_ALGEA(Units.inchesToMeters(21.91)),
-        HIGH_ALGEA(Units.inchesToMeters(37.91));
+        LOW_algae(Units.inchesToMeters(21.91)),
+        HIGH_algae(Units.inchesToMeters(37.91));
 
         private final double height;
 
@@ -201,8 +203,8 @@ public class ElevatorPivotConstants {
         L2(100.75),
         L4_AUTO(140), // again these may be redundant
         L4_V2(140),
-        LOW_ALGEA(-90),
-        HIGH_ALGEA(-90);
+        LOW_algae(-90),
+        HIGH_algae(-90);
 
         private final double angle;
 

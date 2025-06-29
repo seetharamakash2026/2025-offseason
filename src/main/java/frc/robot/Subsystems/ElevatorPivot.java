@@ -55,7 +55,7 @@ public class ElevatorPivot extends SubsystemBase {
   private TalonFX leftMotor = new TalonFX(leftMotorId, canbus);
   private TalonFX pivotMotor = new TalonFX(pivotMotorId, canbus);
   private CANcoder pivotCancoder = new CANcoder(pivotCancoderId, canbus);
-  private static CANrange algeaSensor = new CANrange(canRangeId, canbus);
+  private static CANrange algaeSensor = new CANrange(canRangeId, canbus);
 
   private double targetHeight;
   private double targetAngleDegrees;
@@ -70,7 +70,7 @@ public class ElevatorPivot extends SubsystemBase {
 
   public Trigger atTargetHeight = new Trigger(() -> atTargetHeight());
   public Trigger atTargetAngle = new Trigger(() -> atTargetAngle());
-  public static Trigger hasAlgea = new Trigger(() -> hasAlgea()).debounce(debounceTime, DebounceType.kFalling);
+  public static Trigger hasalgae = new Trigger(() -> hasalgae()).debounce(debounceTime, DebounceType.kFalling);
   public Trigger safeToMove = new Trigger(() -> isSafeToMove());
 
   /** Creates a new Elevator. */
@@ -97,7 +97,7 @@ public class ElevatorPivot extends SubsystemBase {
         .apply(elevatorMotorConfig.withMotorOutput(motorOutputConfigs.withInverted(leftInverted)));
     pivotMotor.getConfigurator().apply(pivotMotorConfig);
     pivotCancoder.getConfigurator().apply(pivotCancoderConfig);
-    algeaSensor.getConfigurator().apply(canRangeConfig);
+    algaeSensor.getConfigurator().apply(canRangeConfig);
 
     // Clear Sticky faults
     rightMotor.clearStickyFaults();
@@ -218,8 +218,8 @@ public class ElevatorPivot extends SubsystemBase {
     return (height - minimumHeight) / rotationToLengthRatio;
   }
 
-  public static boolean hasAlgea() {
-    return algeaSensor.getIsDetected(true).getValue();
+  public static boolean hasalgae() {
+    return algaeSensor.getIsDetected(true).getValue();
   }
 
   /**
@@ -367,7 +367,7 @@ public class ElevatorPivot extends SubsystemBase {
     // GremlinLogger.debugLog("4th", false);
 
 /*    if (targetAngleDegrees > getPivotAngleDegrees()
-        && getPivotAngleDegrees() < maxUpperCollisionAngle && !hasAlgea()) {
+        && getPivotAngleDegrees() < maxUpperCollisionAngle && !hasalgae()) {
       tempTargetAngle = travelAngle;
       tempTargetHeight = heightMeters;
       // GremlinLogger.debugLog("first", true);
@@ -381,8 +381,8 @@ public class ElevatorPivot extends SubsystemBase {
       // GremlinLogger.debugLog("second", true);
     }
 
-    if (hasAlgea() && targetAngleDegrees > maxAlgeaCollisionAngle && getHeight() < algeaReadyHeight) {
-      tempTargetAngle = algeaTravelAngle;
+    if (hasalgae() && targetAngleDegrees > maxalgaeCollisionAngle && getHeight() < algaeReadyHeight) {
+      tempTargetAngle = algaeTravelAngle;
       // GremlinLogger.debugLog("4th", true);
     };
 
@@ -391,17 +391,12 @@ public class ElevatorPivot extends SubsystemBase {
       // GremlinLogger.debugLog("third", true);
     }
  */
-    if (claw.hasAlgae() && getHeight() >= algaeClearHeight && heightMeters >= algaeClearHeight) {
-      tempTargetHeight = heightMeters;
-      tempTargetAngle = angleDegrees;
-    } else if (claw.hasCoral() && getHeight() >= coralClearHeight && heightMeters >= coralClearHeight) {
-      tempTargetHeight = heightMeters;
-      tempTargetAngle = angleDegrees;
-    } else if (!(claw.hasCoral() || claw.hasAlgae()) && getHeight() >= nothingClearHeight && heightMeters >= nothingClearHeight) {
-      tempTargetHeight = heightMeters;
-      tempTargetAngle = angleDegrees;
+    
+    if (hasalgae() && )
+
+    if (atTargetHeight()) {
+      tempTargetAngle = targetAngleDegrees;
     }
-   
 
     GremlinLogger.debugLog("tempAngle", tempTargetAngle);
     GremlinLogger.debugLog("TempHeight", tempTargetHeight);
@@ -465,7 +460,7 @@ public class ElevatorPivot extends SubsystemBase {
    * @return a command to stow the arm
    */
   public Command stowArm() {
-    return goToPosition(() -> stowHeight, () -> hasAlgea() ? algeaTravelAngle : stowAngle);
+    return goToPosition(() -> stowHeight, () -> hasalgae() ? algaeTravelAngle : stowAngle);
   }
 
   public Command troughArm(){
@@ -514,11 +509,11 @@ public class ElevatorPivot extends SubsystemBase {
   }
 
   public Command goToBargeReady(){
-    return goToPosition(() -> algeaReadyHeight, () -> algeaReadyAngle);
+    return goToPosition(() -> algaeReadyHeight, () -> algaeReadyAngle);
   }
 
   public Command goToBargeThrow(){
-    return goToPosition(() -> algeaThrowHeight, () -> algeaThrowAngle);
+    return goToPosition(() -> algaeThrowHeight, () -> algaeThrowAngle);
   }
 
   /**
@@ -681,7 +676,7 @@ public class ElevatorPivot extends SubsystemBase {
     if (GremlinLogger.isDebug())
       updateMechanism2d();
 
-    SmartDashboard.putBoolean("Has Algea", hasAlgea());
+    SmartDashboard.putBoolean("Has algae", hasalgae());
     SmartDashboard.putBoolean("At Height", atTargetHeight());
     SmartDashboard.putBoolean("At Angle", atTargetAngle());
     GremlinLogger.debugLog("Elevator Velocity", getVerticalVelocity());
@@ -690,7 +685,7 @@ public class ElevatorPivot extends SubsystemBase {
   /* SIMULATION */
   private final ElevatorSim elevatorSim = new ElevatorSim(
       DCMotor.getKrakenX60Foc(2),
-      totalGearing,
+      totalgaering,
       carriageMass,
       drumRadius,
       minimumHeight,
@@ -700,7 +695,7 @@ public class ElevatorPivot extends SubsystemBase {
 
   private final SingleJointedArmSim armSim = new SingleJointedArmSim(
       DCMotor.getKrakenX60Foc(1),
-      pivotTotalGearing,
+      pivotTotalgaering,
       pivotMOI,
       pivotArmLength,
       Units.degreesToRadians(minAngleDegrees),
@@ -712,7 +707,7 @@ public class ElevatorPivot extends SubsystemBase {
   private TalonFXSimState leftMotorSim;
   private TalonFXSimState pivotMotorSim;
   private CANcoderSimState pivotCancoderSim;
-  private CANrangeSimState algeaSensorSim;
+  private CANrangeSimState algaeSensorSim;
 
   private Mechanism2d pivotMechanism = new Mechanism2d(canvasWidth, canvasHeight);
 
@@ -729,7 +724,7 @@ public class ElevatorPivot extends SubsystemBase {
     leftMotorSim = leftMotor.getSimState();
     pivotMotorSim = pivotMotor.getSimState();
     pivotCancoderSim = pivotCancoder.getSimState();
-    algeaSensorSim = algeaSensor.getSimState();
+    algaeSensorSim = algaeSensor.getSimState();
 
     rightMotorSim.Orientation = ChassisReference.CounterClockwise_Positive;
     leftMotorSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -749,16 +744,16 @@ public class ElevatorPivot extends SubsystemBase {
     leftMotorSim = leftMotor.getSimState();
     pivotMotorSim = pivotMotor.getSimState();
     pivotCancoderSim = pivotCancoder.getSimState();
-    algeaSensorSim = algeaSensor.getSimState();
+    algaeSensorSim = algaeSensor.getSimState();
 
     // update with latest simulated supply voltage
     rightMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
     leftMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
     pivotMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
     pivotCancoderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-    algeaSensorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+    algaeSensorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-    algeaSensorSim.setDistance(proximityThreshold + 0.1);
+    algaeSensorSim.setDistance(proximityThreshold + 0.1);
 
     // get output voltage for motors, we assume both output same amount
     // since they are identical just two different sides
@@ -778,16 +773,16 @@ public class ElevatorPivot extends SubsystemBase {
     // If directly applying to motors note that motors require rotor
     // position/velocity (before gear ratio), but
     // DCMotorSim returns mechanism position/velocity (after gear ratio)
-    rightMotorSim.setRawRotorPosition(convertHeightToRotations(elevatorSim.getPositionMeters()) * totalGearing);
-    leftMotorSim.setRawRotorPosition(convertHeightToRotations(elevatorSim.getPositionMeters()) * totalGearing);
-    rightMotorSim.setRotorVelocity(convertVelocityToRotations(elevatorSim.getVelocityMetersPerSecond()) * totalGearing);
+    rightMotorSim.setRawRotorPosition(convertHeightToRotations(elevatorSim.getPositionMeters()) * totalgaering);
+    leftMotorSim.setRawRotorPosition(convertHeightToRotations(elevatorSim.getPositionMeters()) * totalgaering);
+    rightMotorSim.setRotorVelocity(convertVelocityToRotations(elevatorSim.getVelocityMetersPerSecond()) * totalgaering);
     leftMotorSim
-        .setRawRotorPosition(convertVelocityToRotations(elevatorSim.getVelocityMetersPerSecond()) * totalGearing);
+        .setRawRotorPosition(convertVelocityToRotations(elevatorSim.getVelocityMetersPerSecond()) * totalgaering);
 
     pivotCancoderSim.setRawPosition(Units.radiansToRotations(armSim.getAngleRads() * pivotSensorToMechanismRatio));
     pivotCancoderSim.setVelocity(Units.radiansToRotations(armSim.getVelocityRadPerSec() * pivotSensorToMechanismRatio));
-    pivotMotorSim.setRawRotorPosition(Units.radiansToRotations(armSim.getAngleRads() * pivotTotalGearing));
-    pivotMotorSim.setRotorVelocity(Units.radiansToRotations(armSim.getVelocityRadPerSec() * pivotTotalGearing));
+    pivotMotorSim.setRawRotorPosition(Units.radiansToRotations(armSim.getAngleRads() * pivotTotalgaering));
+    pivotMotorSim.setRotorVelocity(Units.radiansToRotations(armSim.getVelocityRadPerSec() * pivotTotalgaering));
 
     updateMechanism2d();
   }

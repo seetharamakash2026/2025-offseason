@@ -243,7 +243,7 @@ public class Intake extends SubsystemBase{
         );
         private final SingleJointedArmSim singleJointedArmSim = new SingleJointedArmSim(
             DCMotor.getKrakenX60(1),
-            pivotTotalGearing, 
+            pivotTotalgaering, 
             pivotMOI, 
             intakeLength,  
             edu.wpi.first.math.util.Units.degreesToRadians(minAngle),
@@ -296,8 +296,8 @@ public class Intake extends SubsystemBase{
 
             backCancoderSim.setRawPosition(edu.wpi.first.math.util.Units.radiansToRotations((singleJointedArmSim.getAngleRads() * pivotSensorToMechanismRatio))); 
             backCancoderSim.setVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotSensorToMechanismRatio)); 
-            backMotorSim.setRawRotorPosition(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getAngleRads() * pivotTotalGearing));
-            backMotorSim.setRotorVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotTotalGearing));
+            backMotorSim.setRawRotorPosition(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getAngleRads() * pivotTotalgaering));
+            backMotorSim.setRotorVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotTotalgaering));
             
             updateMechanism2d();
         

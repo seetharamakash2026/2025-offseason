@@ -34,7 +34,7 @@ public class IntakeConstants{
 
     public static final double pivotRotorToSensorRatio = 1; // no idea how this is calculated
     public static final double pivotSensorToMechanismRatio = 1;
-    public static final double pivotTotalGearing = pivotSensorToMechanismRatio * pivotRotorToSensorRatio;
+    public static final double pivotTotalgaering = pivotSensorToMechanismRatio * pivotRotorToSensorRatio;
     public static final double pivotMOI = 0.0000000001; // probably make this a real value? 
     public static final double intakeLength = Units.inchesToMeters(19.712057);
 
