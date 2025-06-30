@@ -6,28 +6,23 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.NamedCommands;
 
 import dev.doglog.DogLogOptions;
 import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-// import frc.robot.Constants.IntakeConstants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.Commands.DriveToPose;
 import frc.robot.RobotState.DriveState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain;
-// import frc.robot.Subsystems.Intake;
 import frc.robot.commons.GremlinLogger;
 import frc.robot.commons.GremlinPS4Controller;
-import frc.robot.generated.TunerConstants;
-import frc.robot.Subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -81,6 +76,10 @@ public class RobotContainer {
               .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
               .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
       )
+    );
+
+    joystick.R2().onTrue(
+      new DriveToPose(drivetrain, new Pose2d(10, 10, new Rotation2d(180)))
     );
   }
 
