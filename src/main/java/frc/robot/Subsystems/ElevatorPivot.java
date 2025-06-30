@@ -71,7 +71,7 @@ public class ElevatorPivot extends SubsystemBase {
 
   public Trigger atTargetHeight = new Trigger(() -> atTargetHeight());
   public Trigger atTargetAngle = new Trigger(() -> atTargetAngle());
-  public static Trigger hasalgae = new Trigger(() -> hasalgae()).debounce(debounceTime, DebounceType.kFalling);
+  public static Trigger hasAlgae = new Trigger(() -> hasAlgae()).debounce(debounceTime, DebounceType.kFalling);
   public Trigger safeToMove = new Trigger(() -> isSafeToMove());
 
   /** Creates a new Elevator. */
@@ -220,7 +220,7 @@ public class ElevatorPivot extends SubsystemBase {
     return (height - minimumHeight) / rotationToLengthRatio;
   }
 
-  public static boolean hasalgae() {
+  public static boolean hasAlgae() {
     return algaeSensor.getIsDetected(true).getValue();
   }
 
@@ -361,7 +361,7 @@ public class ElevatorPivot extends SubsystemBase {
    * @param heightMeters the final desired height in meters
    * @param angleDegrees the final desired angle in degrees
    */
-  private void setTargetHeightAndAngle(double heightMeters, double angleDegrees, Claw claw) {
+  private void setTargetHeightAndAngle(double heightMeters, double angleDegrees) {
     this.targetHeight = GremlinUtil.clampWithLogs(maxHeight, minimumHeight, heightMeters);
     this.targetAngleDegrees = GremlinUtil.clampWithLogs(maxAngleDegrees, minAngleDegrees, angleDegrees);
     
@@ -373,7 +373,7 @@ public class ElevatorPivot extends SubsystemBase {
     // GremlinLogger.debugLog("4th", false);
 
 /*    if (targetAngleDegrees > getPivotAngleDegrees()
-        && getPivotAngleDegrees() < maxUpperCollisionAngle && !hasalgae()) {
+        && getPivotAngleDegrees() < maxUpperCollisionAngle && !hasAlgae()) {
       tempTargetAngle = travelAngle;
       tempTargetHeight = heightMeters;
       // GremlinLogger.debugLog("first", true);
@@ -387,7 +387,7 @@ public class ElevatorPivot extends SubsystemBase {
       // GremlinLogger.debugLog("second", true);
     }
 
-    if (hasalgae() && targetAngleDegrees > maxalgaeCollisionAngle && getHeight() < algaeReadyHeight) {
+    if (hasAlgae() && targetAngleDegrees > maxalgaeCollisionAngle && getHeight() < algaeReadyHeight) {
       tempTargetAngle = algaeTravelAngle;
       // GremlinLogger.debugLog("4th", true);
     };
@@ -398,7 +398,7 @@ public class ElevatorPivot extends SubsystemBase {
     }
  */
     
-    if (hasalgae() && getHeight() < algaeClearHeight) {
+    if (hasAlgae() && getHeight() < algaeClearHeight) {
       
       tempTargetAngle = algaeTravelAngle;
     } else if (hasCoral() && getHeight() < coralClearHeight) {
@@ -475,7 +475,7 @@ public class ElevatorPivot extends SubsystemBase {
    * @return a command to stow the arm
    */
   public Command stowArm() {
-    return goToPosition(() -> stowHeight, () -> hasalgae() ? algaeTravelAngle : stowAngle);
+    return goToPosition(() -> stowHeight, () -> hasAlgae() ? algaeTravelAngle : stowAngle);
   }
 
   public Command troughArm(){
@@ -691,7 +691,7 @@ public class ElevatorPivot extends SubsystemBase {
     if (GremlinLogger.isDebug())
       updateMechanism2d();
 
-    SmartDashboard.putBoolean("Has algae", hasalgae());
+    SmartDashboard.putBoolean("Has algae", hasAlgae());
     SmartDashboard.putBoolean("At Height", atTargetHeight());
     SmartDashboard.putBoolean("At Angle", atTargetAngle());
     GremlinLogger.debugLog("Elevator Velocity", getVerticalVelocity());
