@@ -56,6 +56,7 @@ public class ElevatorPivot extends SubsystemBase {
   private TalonFX pivotMotor = new TalonFX(pivotMotorId, canbus);
   private CANcoder pivotCancoder = new CANcoder(pivotCancoderId, canbus);
   private static CANrange algaeSensor = new CANrange(canRangeId, canbus);
+  private static CANrange coralSensor = new CANrange(canRangeIdCoral, canbus);
 
   private double targetHeight;
   private double targetAngleDegrees;
@@ -98,6 +99,7 @@ public class ElevatorPivot extends SubsystemBase {
     pivotMotor.getConfigurator().apply(pivotMotorConfig);
     pivotCancoder.getConfigurator().apply(pivotCancoderConfig);
     algaeSensor.getConfigurator().apply(canRangeConfig);
+    coralSensor.getConfigurator().apply(coralRangeConfig);
 
     // Clear Sticky faults
     rightMotor.clearStickyFaults();
@@ -220,6 +222,10 @@ public class ElevatorPivot extends SubsystemBase {
 
   public static boolean hasalgae() {
     return algaeSensor.getIsDetected(true).getValue();
+  }
+
+  public static boolean hasCoral() {
+    return coralSensor.getIsDetected(true).getValue();
   }
 
   /**
@@ -392,7 +398,16 @@ public class ElevatorPivot extends SubsystemBase {
     }
  */
     
-    if (hasalgae() && )
+    if (hasalgae() && getHeight() < algaeClearHeight) {
+      
+      tempTargetAngle = algaeTravelAngle;
+    } else if (hasCoral() && getHeight() < coralClearHeight) {
+      
+      tempTargetAngle = coralTravelAngle;
+    } else if (getHeight() < algaeClearHeight) {
+
+      tempTargetAngle = coralTravelAngle;
+    }
 
     if (atTargetHeight()) {
       tempTargetAngle = targetAngleDegrees;

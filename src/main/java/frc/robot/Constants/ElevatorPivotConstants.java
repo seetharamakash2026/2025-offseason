@@ -19,6 +19,7 @@ import com.ctre.phoenix6.configs.ProximityParamsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.ToFParamsConfigs;
+import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.core.CoreCANcoder;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -37,6 +38,8 @@ public class ElevatorPivotConstants {
     public static final int pivotMotorId = 17;
     public static final int pivotCancoderId = 16;
     public static final int canRangeId = 18;
+    public static final int canRangeIdCoral = 19; // (?)
+
     public static final String canbus = "Canivore 3045";
 
     public static final String elevatorTable = "elevator";
@@ -334,5 +337,34 @@ public class ElevatorPivotConstants {
     public static final CANrangeConfiguration canRangeConfig = new CANrangeConfiguration()
             .withFovParams(fovConfigs)
             .withProximityParams(proximityConfigs)
+            .withToFParams(tofConfigs);
+
+
+
+    // must be tuned
+   public static final double coralFovCenterX = 0; 
+   public static final double coralFovCenterY = 0;
+   public static final double coralFovRangeX = 6.75;
+   public static final double coralFovRangeY = 6.75;
+        
+   public static final double coralMinSignalStrength = 0;
+   public static final double coralProximityHysterisis = 0.01; // 1 cm
+   public static final double coralProximityThreshold = 0.08; // 8cm
+
+
+    public static final FovParamsConfigs coralFovConfigs = new FovParamsConfigs()
+            .withFOVCenterX(coralFovCenterX)
+            .withFOVCenterY(coralFovCenterY)
+            .withFOVRangeX(coralFovRangeX)
+            .withFOVRangeY(coralFovRangeY);
+
+    public static final ProximityParamsConfigs coralProximityConfigs = new ProximityParamsConfigs()
+            .withMinSignalStrengthForValidMeasurement(coralMinSignalStrength)
+            .withProximityHysteresis(coralProximityHysterisis)
+            .withProximityThreshold(coralProximityThreshold);
+
+    public static final CANrangeConfiguration coralRangeConfig = new CANrangeConfiguration()
+            .withFovParams(coralFovConfigs)
+            .withProximityParams(coralProximityConfigs)
             .withToFParams(tofConfigs);
 }
