@@ -78,8 +78,8 @@ public class RobotContainer {
       )
     );
 
-    joystick.R2().onTrue(
-      new DriveToPose(drivetrain, new Pose2d(10, 10, new Rotation2d(180)))
+    joystick.L2().onTrue(
+      new DriveToPose(drivetrain, new Pose2d(10, 10, new Rotation2d(0)))
     );
   }
 
