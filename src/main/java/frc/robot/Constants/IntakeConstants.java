@@ -19,8 +19,8 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.math.util.Units;
 
 public class IntakeConstants{
-    public static final int frontMotorID = 0;
-    public static final int backMotorID = 1; 
+    public static final int frontMotorID = 14;
+    public static final int backMotorID = 13; 
 
     public static final String CAN_STRING = "Canivore 3045";
     public static final int backCancoderId = 2;
@@ -34,7 +34,7 @@ public class IntakeConstants{
 
     public static final double pivotRotorToSensorRatio = 1; // no idea how this is calculated
     public static final double pivotSensorToMechanismRatio = 1;
-    public static final double pivotTotalGearing = pivotSensorToMechanismRatio * pivotRotorToSensorRatio;
+    public static final double pivotTotalgaering = pivotSensorToMechanismRatio * pivotRotorToSensorRatio;
     public static final double pivotMOI = 0.0000000001; // probably make this a real value? 
     public static final double intakeLength = Units.inchesToMeters(19.712057);
 
