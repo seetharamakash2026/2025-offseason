@@ -29,8 +29,8 @@ public class Claw extends SubsystemBase{
         configDevices();
 
         if (Utils.isSimulation()) {
-                configSimulation(); // define
-            }
+            configSimulation(); // define
+        }
     }
 
     public void configDevices() {
