@@ -219,23 +219,6 @@ public class Intake extends SubsystemBase{
             SmartDashboard.putBoolean("rarely is the question asked, is our children spinning?", spinning());
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // sim
         private final FlywheelSim flywheelSim = new FlywheelSim(
             LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60(1), flywheelMOI, flywheelGearing),
@@ -243,7 +226,7 @@ public class Intake extends SubsystemBase{
         );
         private final SingleJointedArmSim singleJointedArmSim = new SingleJointedArmSim(
             DCMotor.getKrakenX60(1),
-            pivotTotalgaering, 
+            pivotTotalGearing, 
             pivotMOI, 
             intakeLength,  
             edu.wpi.first.math.util.Units.degreesToRadians(minAngle),
@@ -296,8 +279,8 @@ public class Intake extends SubsystemBase{
 
             backCancoderSim.setRawPosition(edu.wpi.first.math.util.Units.radiansToRotations((singleJointedArmSim.getAngleRads() * pivotSensorToMechanismRatio))); 
             backCancoderSim.setVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotSensorToMechanismRatio)); 
-            backMotorSim.setRawRotorPosition(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getAngleRads() * pivotTotalgaering));
-            backMotorSim.setRotorVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotTotalgaering));
+            backMotorSim.setRawRotorPosition(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getAngleRads() * pivotTotalGearing));
+            backMotorSim.setRotorVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotTotalGearing));
             
             updateMechanism2d();
         
