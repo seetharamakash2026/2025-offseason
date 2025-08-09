@@ -7,22 +7,26 @@ package frc.robot.Commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Commands.DriveToPose;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.Subsystems.CommandSwerveDrivetrain;
+import frc.robot.Subsystems.ElevatorPivot;
+import frc.robot.commons.Translation2DUtils;
 
 import static frc.robot.Constants.AutoScoreConstants.*;
-
-import org.dyn4j.geometry.Rotatable;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoScoreCoral extends Command {
   private Pose2d position;
   private CommandSwerveDrivetrain drivetrain;
-  private Command driveToPose;
+  private Command driveToPose1;
+  private Command driveToPose2;
   private int phase = 0;
+  private IntegerSubscriber poleHeightSubscriber;
   private Translation2d midpoint(Translation2d a, Translation2d b) {
     return new Translation2d(a.getX() + (b.getX() - a.getX())/2, a.getY() + (b.getY() - a.getY())/2);
   }
@@ -59,46 +63,71 @@ public class AutoScoreCoral extends Command {
     }
     return new Pose2d(closest, new Rotation2d(ROTATIONS[idx]));
   }
+
   /** Creates a new AutoScoreCoral. */
-  public AutoScoreCoral(CommandSwerveDrivetrain Drivetrain) {
+  public AutoScoreCoral(CommandSwerveDrivetrain Drivetrain, IntegerSubscriber PoleHeightSubscriber) {
     drivetrain = Drivetrain;
     position = findPose(drivetrain.getState().Pose.getTranslation());
-    driveToPose = new DriveToPose(drivetrain, position);
-    // Use addRequirements() here to declare subsystem dependencies.
+    driveToPose1 = new DriveToPose(drivetrain, position);
+    poleHeightSubscriber = PoleHeightSubscriber;
   }
 
-  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    driveToPose.schedule();
+    driveToPose1.schedule();
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     switch (phase) {
       case 0:
-        if (driveToPose.isFinished()) {
-          phase = 1;
+        if (driveToPose1.isFinished()) {
+          phase += 1;
         }
         break;
       case 1:
         //Drive back
+        Translation2d reefCenter;
+        if (DriverStation.getAlliance().get() == Alliance.Red) {
+          reefCenter = REEF_CENTERS[0];
+        } else {
+          reefCenter = REEF_CENTERS[1];
+        }
+        Translation2d vector = reefCenter.minus(position.getTranslation());
+        vector = Translation2DUtils.normalize(vector);
+        vector.times(BACKUP_DIST);
+        driveToPose2 = new DriveToPose(drivetrain, new Pose2d(position.getTranslation().plus(vector), position.getRotation()));
+        driveToPose2.schedule();
+
+        if (driveToPose2.isFinished()) {
+          phase += 1;
+        }
         break;
       case 2:
-        //Score
+        //Move elvator up and turn
+        long poleNum = poleHeightSubscriber.get();
+        double height = SCORE_HEIGHTS[(int) poleNum];
+        double rot = SCORE_ANGLES[(int) poleNum];
+        ElevatorPivot pivot = RobotContainer.elevatorPivot;
+        pivot.goToPosition(() -> {return height;}, () -> {return rot;});
+
+        if (pivot.atTargetAngle() && pivot.atTargetHeight()) {
+          phase += 1;
+        }
         break;
-      //Phase 3 means that the command is done
+      case 3:
+        //Score
+      case 4:
+        //Reset
+      //Phase 5 means that the command is done
     }
   }
 
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}
 
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (phase == 3);
+    return (phase >= 5);
   }
 }

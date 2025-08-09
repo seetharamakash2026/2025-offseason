@@ -21,6 +21,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.Commands.DriveToPose;
 import frc.robot.RobotState.DriveState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain;
+import frc.robot.Subsystems.ElevatorPivot;
 import frc.robot.commons.GremlinLogger;
 import frc.robot.commons.GremlinPS4Controller;
 
@@ -43,6 +44,7 @@ public class RobotContainer {
   // public final Intake intake = new Intake();
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  public final static ElevatorPivot elevatorPivot = new ElevatorPivot();
 
 
   public final Trigger intakeState = new Trigger(() -> M_ROBOT_STATE.getDriveState() == DriveState.INTAKE);
