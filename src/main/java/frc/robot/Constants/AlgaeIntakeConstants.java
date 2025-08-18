@@ -18,14 +18,14 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import edu.wpi.first.math.util.Units;
 
-public class IntakeConstants{
-    public static final int frontMotorID = 14;
-    public static final int backMotorID = 13; 
+public class AlgaeIntakeConstants {
+    public static final int pivotMotorID = 15;
+    public static final int spinMotorID = 17;
 
     public static final String CAN_STRING = "Canivore 3045";
-    public static final int backCancoderId = 2;
+    public static final int backCancoderId = 3;
 
-    public static final String intakeTable = "intake"; 
+    public static final String algaeIntakeTable = "algaeIntake"; 
 
     public static final double canvasHeight = 2; 
     public static final double canvasWidth = 6; 
@@ -33,19 +33,19 @@ public class IntakeConstants{
     public static final double timesyncFrequency = 200; // Hz
 
     public static final double pivotRotorToSensorRatio = 1; // no idea how this is calculated
-    public static final double pivotSensorToMechanismRatio = 1;
+    public static final double pivotSensorToMechanismRatio = 4216/81; 
     public static final double pivotTotalGearing = pivotSensorToMechanismRatio * pivotRotorToSensorRatio;
     public static final double pivotMOI = 0.0000000001; // probably make this a real value? 
-    public static final double intakeLength = Units.inchesToMeters(19.712057);
+    public static final double intakeLength = Units.inchesToMeters(18.824027);
 
     public static final double angleToleranceDegrees = 5; 
 
-    public static final double maxAngle = 90; 
+    public static final double maxAngle = 90;
     public static final double minAngle = 0; 
 
-    public static final double pivotOffsetX = Units.inchesToMeters(7.441);
-    public static final double pivotOffsetY = Units.inchesToMeters(5.940080);
-    public static final double pivotOffsetZ = Units.inchesToMeters(-1.189711);
+    public static final double pivotOffsetX = Units.inchesToMeters(-12.959749);
+    public static final double pivotOffsetY = Units.inchesToMeters(-11.260);
+    public static final double pivotOffsetZ = Units.inchesToMeters(-6.608);
 
     // for front motor, which spins the wheels
     public static final double frontStatorCurrentLimit = 60; // Amps
@@ -58,7 +58,7 @@ public class IntakeConstants{
     public static final InvertedValue frontInvert = InvertedValue.CounterClockwise_Positive; 
 
     public static final double flywheelMOI = 0.00000000001; // probably make this a real value?
-    public static final double flywheelGearing = 44 / 12;
+    public static final double flywheelGearing = 25 / 12;
 
     public static final CurrentLimitsConfigs frontCurrentLimits = new CurrentLimitsConfigs()
             .withStatorCurrentLimit(frontStatorCurrentLimit)
@@ -148,3 +148,5 @@ public class IntakeConstants{
                     .withAbsoluteSensorDiscontinuityPoint(0.5) // [-0.5,0.5]
                     .withMagnetOffset(magnetOffset));
 }
+
+
