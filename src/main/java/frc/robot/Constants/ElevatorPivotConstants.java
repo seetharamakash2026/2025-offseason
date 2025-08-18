@@ -52,8 +52,8 @@ public class ElevatorPivotConstants {
 
     public static final double pivotArmLength = Units.inchesToMeters(14.961856); // m
     public static final double carriageHeightToPivot = Units.inchesToMeters(-1.00);
-    public static final double minAngleDegrees = -180;
-    public static final double maxAngleDegrees = 180;
+    public static final double minAngleDegrees = -90;
+    public static final double maxAngleDegrees = 270;
     public static final double stowAngle = 0;
     public static final double intakingAngle = -90; // intaking coral
     public static final double processingAngle = -90;

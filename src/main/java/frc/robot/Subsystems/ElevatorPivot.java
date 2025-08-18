@@ -339,10 +339,14 @@ public class ElevatorPivot extends SubsystemBase {
    * setTargetHeightAndAngle to prevent collision issues.
    */
   private void setAngleTargetDegrees(double targetAngleDegrees) {
-    // TODO: add check if travelling downwards then make sure the pivot wont hit the
-    // next stage bar
+    if (targetAngleDegrees > maxAngleDegrees) {
+      targetAngleDegrees = maxAngleDegrees;
+    } else if (targetAngleDegrees < minAngleDegrees) {
+      targetAngleDegrees = minAngleDegrees;
+    }
 
     double targetAngleRotations = Units.degreesToRotations(targetAngleDegrees);
+    
 
     MotionMagicVoltage request = new MotionMagicVoltage(targetAngleRotations)
         .withEnableFOC(true).withSlot(0).withUpdateFreqHz(1000); // every 1 ms
