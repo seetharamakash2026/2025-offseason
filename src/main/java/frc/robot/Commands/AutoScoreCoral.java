@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.Subsystems.Claw;
 import frc.robot.Subsystems.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.ElevatorPivot;
 import frc.robot.commons.Translation2DUtils;
@@ -23,9 +24,14 @@ import static frc.robot.Constants.AutoScoreConstants.*;
 public class AutoScoreCoral extends Command {
   private Pose2d position;
   private CommandSwerveDrivetrain drivetrain;
-  private Command driveToPose1;
-  private Command driveToPose2;
+  private Command driveToReef;
+  private Command driveBack;
+  private Command driveForward;
   private int phase = 0;
+  private ElevatorPivot pivot = RobotContainer.elevatorPivot;
+  private Claw claw = RobotContainer.claw;
+  private Translation2d vector;
+  private Translation2d reefCenter;
   private IntegerSubscriber poleHeightSubscriber;
   private Translation2d midpoint(Translation2d a, Translation2d b) {
     return new Translation2d(a.getX() + (b.getX() - a.getX())/2, a.getY() + (b.getY() - a.getY())/2);
@@ -68,38 +74,37 @@ public class AutoScoreCoral extends Command {
   public AutoScoreCoral(CommandSwerveDrivetrain Drivetrain, IntegerSubscriber PoleHeightSubscriber) {
     drivetrain = Drivetrain;
     position = findPose(drivetrain.getState().Pose.getTranslation());
-    driveToPose1 = new DriveToPose(drivetrain, position);
+    driveToReef = new DriveToPose(drivetrain, position);
     poleHeightSubscriber = PoleHeightSubscriber;
   }
 
   @Override
   public void initialize() {
-    driveToPose1.schedule();
+    driveToReef.schedule();
   }
 
   @Override
   public void execute() {
     switch (phase) {
       case 0:
-        if (driveToPose1.isFinished()) {
+        if (driveToReef.isFinished()) {
           phase += 1;
         }
         break;
       case 1:
         //Drive back
-        Translation2d reefCenter;
         if (DriverStation.getAlliance().get() == Alliance.Red) {
           reefCenter = REEF_CENTERS[0];
         } else {
           reefCenter = REEF_CENTERS[1];
         }
-        Translation2d vector = reefCenter.minus(position.getTranslation());
+        vector = reefCenter.minus(position.getTranslation());
         vector = Translation2DUtils.normalize(vector);
         vector.times(BACKUP_DIST);
-        driveToPose2 = new DriveToPose(drivetrain, new Pose2d(position.getTranslation().plus(vector), position.getRotation()));
-        driveToPose2.schedule();
+        driveBack = new DriveToPose(drivetrain, new Pose2d(position.getTranslation().plus(vector), position.getRotation()));
+        driveBack.schedule();
 
-        if (driveToPose2.isFinished()) {
+        if (driveBack.isFinished()) {
           phase += 1;
         }
         break;
@@ -108,7 +113,6 @@ public class AutoScoreCoral extends Command {
         long poleNum = poleHeightSubscriber.get();
         double height = SCORE_HEIGHTS[(int) poleNum];
         double rot = SCORE_ANGLES[(int) poleNum];
-        ElevatorPivot pivot = RobotContainer.elevatorPivot;
         pivot.goToPosition(() -> {return height;}, () -> {return rot;});
 
         if (pivot.atTargetAngle() && pivot.atTargetHeight()) {
@@ -116,10 +120,47 @@ public class AutoScoreCoral extends Command {
         }
         break;
       case 3:
-        //Score
+        //Drive forward
+        if (DriverStation.getAlliance().get() == Alliance.Red) {
+          reefCenter = REEF_CENTERS[0];
+        } else {
+          reefCenter = REEF_CENTERS[1];
+        }
+        vector = reefCenter.minus(position.getTranslation());
+        vector = Translation2DUtils.normalize(vector);
+        vector.times(-BACKUP_DIST);
+        driveForward = new DriveToPose(drivetrain, new Pose2d(position.getTranslation().plus(vector), position.getRotation()));
+        driveForward.schedule();
+
+        if (driveForward.isFinished()) {
+          phase += 1;
+        }
       case 4:
+        //Score
+        claw.outtake().until(() -> !ElevatorPivot.hasCoral()).andThen(claw.stop());
+      case 5:
+        //Drive back
+        if (DriverStation.getAlliance().get() == Alliance.Red) {
+          reefCenter = REEF_CENTERS[0];
+        } else {
+          reefCenter = REEF_CENTERS[1];
+        }
+        vector = reefCenter.minus(position.getTranslation());
+        vector = Translation2DUtils.normalize(vector);
+        vector.times(BACKUP_DIST);
+        driveBack = new DriveToPose(drivetrain, new Pose2d(position.getTranslation().plus(vector), position.getRotation()));
+        driveBack.schedule();
+
+        if (driveBack.isFinished()) {
+          phase += 1;
+        }
+      case 6:
         //Reset
-      //Phase 5 means that the command is done
+        pivot.stowArm();
+        if (pivot.atTargetAngle() && pivot.atTargetHeight()) {
+          phase += 1;
+        }
+      //Phase 7 means that the command is done
     }
   }
 
@@ -128,6 +169,6 @@ public class AutoScoreCoral extends Command {
 
   @Override
   public boolean isFinished() {
-    return (phase >= 5);
+    return (phase >= 7);
   }
 }
