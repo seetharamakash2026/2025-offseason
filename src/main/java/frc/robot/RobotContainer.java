@@ -12,12 +12,15 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
+import frc.robot.Commands.AutoScoreCoral;
 import frc.robot.Commands.DriveToPose;
 import frc.robot.RobotState.DriveState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain;
@@ -44,7 +47,7 @@ public class RobotContainer {
   
   // public final Intake intake = new Intake();
 
-  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  public final static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   public final static ElevatorPivot elevatorPivot = new ElevatorPivot();
   public final static Claw claw = new Claw();
 
@@ -83,7 +86,7 @@ public class RobotContainer {
     );
 
     joystick.L2().onTrue(
-      new DriveToPose(drivetrain, new Pose2d(10, 10, new Rotation2d(0)))
+      new AutoScoreCoral(NetworkTableInstance.getDefault().getTable("Scoring Location").getIntegerTopic("Row").subscribe(0))
     );
   }
 

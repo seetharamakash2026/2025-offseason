@@ -71,8 +71,8 @@ public class AutoScoreCoral extends Command {
   }
 
   /** Creates a new AutoScoreCoral. */
-  public AutoScoreCoral(CommandSwerveDrivetrain Drivetrain, IntegerSubscriber PoleHeightSubscriber) {
-    drivetrain = Drivetrain;
+  public AutoScoreCoral(IntegerSubscriber PoleHeightSubscriber) {
+    drivetrain = RobotContainer.drivetrain;
     position = findPose(drivetrain.getState().Pose.getTranslation());
     driveToReef = new DriveToPose(drivetrain, position);
     poleHeightSubscriber = PoleHeightSubscriber;
