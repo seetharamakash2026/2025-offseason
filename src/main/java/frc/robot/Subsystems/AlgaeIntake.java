@@ -218,75 +218,65 @@ public class AlgaeIntake extends SubsystemBase{
         true,
         edu.wpi.first.math.util.Units.degreesToRadians(minAngle));
     
-        private TalonFXSimState spinnerMotorSim;
-        private TalonFXSimState pivotMotorSim; 
-        private CANcoderSimState pivotCancoderSim;
+    private TalonFXSimState spinnerMotorSim;
+    private TalonFXSimState pivotMotorSim; 
+    private CANcoderSimState pivotCancoderSim;
 
-        private Mechanism2d pivotMech = new Mechanism2d(canvasWidth, canvasHeight);
-        private StructArrayPublisher<Pose3d> componentPosesPublisher = NetworkTableInstance.getDefault()
-            .getTable(algaeIntakeTable)
-            .getStructArrayTopic("componentPoses", Pose3d.struct).publish();
+    private Mechanism2d pivotMech = new Mechanism2d(canvasWidth, canvasHeight);
+    private StructArrayPublisher<Pose3d> componentPosesPublisher = NetworkTableInstance.getDefault()
+        .getTable(algaeIntakeTable)
+        .getStructArrayTopic("componentPoses", Pose3d.struct).publish();
         
-        private MechanismRoot2d pivotRoot = pivotMech.getRoot(("pivotRoot"), 2, 3); // as with the intake I don't know what the 2 and 3 are
-        private MechanismLigament2d pivotLigament = pivotRoot.append(
-            new MechanismLigament2d("algaeIntakeLigament", intakeLength, minAngle)
-        );
+    private MechanismRoot2d pivotRoot = pivotMech.getRoot(("pivotRoot"), 2, 3); // as with the intake I don't know what the 2 and 3 are
+    private MechanismLigament2d pivotLigament = pivotRoot.append(
+        new MechanismLigament2d("algaeIntakeLigament", intakeLength, minAngle)
+    );
 
-        public void configSimulation() {
-            spinnerMotorSim = spinnerMotor.getSimState();
-            pivotMotorSim = pivotMotor.getSimState();
-            pivotCancoderSim = pivotCancoder.getSimState();
+    public void configSimulation() {
+        spinnerMotorSim = spinnerMotor.getSimState();
+        pivotMotorSim = pivotMotor.getSimState();
+        pivotCancoderSim = pivotCancoder.getSimState();
 
-            spinnerMotorSim.Orientation = ChassisReference.CounterClockwise_Positive; // maybe fix
-            pivotMotorSim.Orientation = ChassisReference.CounterClockwise_Positive;
+        spinnerMotorSim.Orientation = ChassisReference.CounterClockwise_Positive; // maybe fix
+        pivotMotorSim.Orientation = ChassisReference.CounterClockwise_Positive;
 
-            singleJointedArmSim.setState(0,0);
-        }
+        singleJointedArmSim.setState(0,0);
+    }
 
-        @Override
-        public void simulationPeriodic() {
-            spinnerMotorSim = spinnerMotor.getSimState();
-            pivotMotorSim = pivotMotor.getSimState();
-            pivotCancoderSim = pivotCancoder.getSimState();
+    @Override
+    public void simulationPeriodic() {
+        spinnerMotorSim = spinnerMotor.getSimState();
+        pivotMotorSim = pivotMotor.getSimState();
+        pivotCancoderSim = pivotCancoder.getSimState();
 
-            spinnerMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-            pivotCancoderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-            pivotMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+        spinnerMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+        pivotCancoderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+        pivotMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-            flywheelSim.setInputVoltage(pivotMotorSim.getMotorVoltageMeasure().in(Volts));
-            flywheelSim.update(0.02);
+        flywheelSim.setInputVoltage(pivotMotorSim.getMotorVoltageMeasure().in(Volts));
+        flywheelSim.update(0.02);
 
-            singleJointedArmSim.setInputVoltage(pivotMotorSim.getMotorVoltageMeasure().in(Volts));
-            singleJointedArmSim.update(0.02);
+        singleJointedArmSim.setInputVoltage(pivotMotorSim.getMotorVoltageMeasure().in(Volts));
+        singleJointedArmSim.update(0.02);
 
 
-            pivotCancoderSim.setRawPosition(edu.wpi.first.math.util.Units.radiansToRotations((singleJointedArmSim.getAngleRads() * pivotSensorToMechanismRatio))); 
-            pivotCancoderSim.setVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotSensorToMechanismRatio)); 
-            pivotMotorSim.setRawRotorPosition(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getAngleRads() * pivotTotalGearing));
-            pivotMotorSim.setRotorVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotTotalGearing));
+        pivotCancoderSim.setRawPosition(edu.wpi.first.math.util.Units.radiansToRotations((singleJointedArmSim.getAngleRads() * pivotSensorToMechanismRatio))); 
+        pivotCancoderSim.setVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotSensorToMechanismRatio)); 
+        pivotMotorSim.setRawRotorPosition(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getAngleRads() * pivotTotalGearing));
+        pivotMotorSim.setRotorVelocity(edu.wpi.first.math.util.Units.radiansToRotations(singleJointedArmSim.getVelocityRadPerSec() * pivotTotalGearing));
             
-            updateMechanism2d();
-        }
+        updateMechanism2d();
+    }
 
-        public void updateMechanism2d() {
-            double currentAngle = getAngleDegrees();
+    public void updateMechanism2d() {
+        double currentAngle = getAngleDegrees();
 
-            if (GremlinLogger.DEBUG) { // ON BY DEFAULT
-                pivotLigament.setAngle(180 - currentAngle); // I have a vague idea of what this is for
+        if (GremlinLogger.DEBUG) { // ON BY DEFAULT
+            pivotLigament.setAngle(180 - currentAngle); // I have a vague idea of what this is for
 
-                componentPosesPublisher.set(new Pose3d[] {
-                    new Pose3d(pivotOffsetX, 
-                                pivotOffsetY, 
-                                pivotOffsetZ, 
-                                new Rotation3d(0, 
-                                                -getangleRadians(), // same reason as the 180 - probably
-                                                0))
-                });
-            }
-
-            GremlinLogger.log("AlgaeIntake/Pivot", new Pose3d[] {
+            componentPosesPublisher.set(new Pose3d[] {
                 new Pose3d(pivotOffsetX, 
-                            pivotOffsetY,
+                            pivotOffsetY, 
                             pivotOffsetZ, 
                             new Rotation3d(0, 
                                             -getangleRadians(), // same reason as the 180 - probably
@@ -294,27 +284,37 @@ public class AlgaeIntake extends SubsystemBase{
             });
         }
 
-        private final SysIdRoutine m_SysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(
-                Volts.of(0.5).per(Second),
-                Volts.of(2),
-                null,
-                (state) -> SignalLogger.writeString("state", state.toString())
-            ),
-            new SysIdRoutine.Mechanism(
-                (volts) -> {
-                    pivotMotor.setVoltage((volts.in(Volts)));
-                }, 
-                null, 
-                this)
-            );
+        GremlinLogger.log("AlgaeIntake/Pivot", new Pose3d[] {
+            new Pose3d(pivotOffsetX, 
+                        pivotOffsetY,
+                        pivotOffsetZ, 
+                        new Rotation3d(0, 
+                                        -getangleRadians(), // same reason as the 180 - probably
+                                        0))
+        });
+    }
+
+    private final SysIdRoutine m_SysIdRoutine = new SysIdRoutine(
+        new SysIdRoutine.Config(
+            Volts.of(0.5).per(Second),
+            Volts.of(2),
+            null,
+            (state) -> SignalLogger.writeString("state", state.toString())
+        ),
+        new SysIdRoutine.Mechanism(
+            (volts) -> {
+                pivotMotor.setVoltage((volts.in(Volts)));
+            }, 
+            null, 
+            this)
+        );
                 
         
         // possibly redundant
-        public Command sysIdQuasistatic(SysIdRoutine.Direction d) {
-            return m_SysIdRoutine.quasistatic(d);
-        }
-        public Command sysIdDynamic(SysIdRoutine.Direction d) {
-            return m_SysIdRoutine.dynamic(d);
-        }
+    public Command sysIdQuasistatic(SysIdRoutine.Direction d) {
+        return m_SysIdRoutine.quasistatic(d);
+    }
+    public Command sysIdDynamic(SysIdRoutine.Direction d) {
+        return m_SysIdRoutine.dynamic(d);
+    }
 }
