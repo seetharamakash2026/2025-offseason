@@ -81,11 +81,11 @@ public class AlgaeIntake extends SubsystemBase{
     }
 
     public double getangleRotations() {
-        return Units.degreesToRadians(pivotCancoder.getPosition().getValueAsDouble());
+        return Units.degreesToRotations(pivotCancoder.getPosition().getValueAsDouble());
     }
 
     public double getAngleDegrees() {
-        return Units.rotationsToDegrees(pivotCancoder.getPosition().getValueAsDouble());
+        return pivotCancoder.getPosition().getValueAsDouble();
     }
 
     public double getangleRadians() {
@@ -93,7 +93,7 @@ public class AlgaeIntake extends SubsystemBase{
     }
 
     public boolean atTargetAngle() {
-        return Math.abs(getAngleDegrees() - targetAngleDegrees) < angleToleranceDegrees; // DEFINE
+        return Math.abs(getAngleDegrees() - targetAngleDegrees) < angleToleranceDegrees; 
     }
 
     private void setAngleTargetDegrees(double targetAngleDegrees) {
@@ -153,7 +153,7 @@ public class AlgaeIntake extends SubsystemBase{
         }); 
     }
     public Command applyDownwardCurrent() {
-        this.runOnce(() ->  {
+        return this.runOnce(() ->  {
             double current = -10;
             pivotMotor.setControl(new TorqueCurrentFOC(current));
         });
@@ -195,7 +195,7 @@ public class AlgaeIntake extends SubsystemBase{
 
     @Override
     public void periodic() {
-        updateMechanism2d(); // define I think who knows at this point I want to sleeeeeeeeeeeep
+        updateMechanism2d(); 
         
         SmartDashboard.putNumber("pivot angle", getAngleDegrees());
         SmartDashboard.putBoolean("is spinning?", spinning()); 
@@ -204,9 +204,9 @@ public class AlgaeIntake extends SubsystemBase{
     // sim
     private final FlywheelSim flywheelSim = new FlywheelSim(
         LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60(1), 
-            flywheelMOI, // define
+            flywheelMOI, 
             flywheelGearing),
-        DCMotor.getKrakenX60(1)); // define
+        DCMotor.getKrakenX60(1));
 
     private final SingleJointedArmSim singleJointedArmSim = new SingleJointedArmSim(
         DCMotor.getKrakenX60(1), 

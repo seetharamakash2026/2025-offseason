@@ -1,7 +1,7 @@
 package frc.robot.Constants;
 
 public class ClawConstants{
-    public static final int motorID = 19;
+    public static final int motorID = 1000;
     public static final String canbus = "Canivore 3045";
 
     public static final int voltage = 3; // ?

@@ -33,9 +33,9 @@ import edu.wpi.first.math.util.Units;
 
 /** Add your docs here. */
 public class ElevatorPivotConstants {
-    public static final int rightMotorId = 15;
-    public static final int leftMotorId = 16;
-    public static final int pivotMotorId = 17;
+    public static final int rightMotorId =  18;
+    public static final int leftMotorId = 19;
+    public static final int pivotMotorId = 13;
     public static final int pivotCancoderId = 16;
     public static final int canRangeId = 18;
     public static final int canRangeIdCoral = 19; // (?)
