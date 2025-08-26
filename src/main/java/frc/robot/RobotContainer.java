@@ -44,6 +44,7 @@ public class RobotContainer {
 
   private final GremlinPS4Controller joystick = new GremlinPS4Controller(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
+  public static final IntegerSubscriber poleHeightSubscriber = NetworkTableInstance.getDefault().getTable("Scoring Location").getIntegerTopic("Row").subscribe(0);
   
   // public final Intake intake = new Intake();
 
@@ -85,9 +86,9 @@ public class RobotContainer {
       )
     );
 
-    joystick.L2().onTrue(
-      new AutoScoreCoral(NetworkTableInstance.getDefault().getTable("Scoring Location").getIntegerTopic("Row").subscribe(0))
-    );
+    // joystick.L2().onTrue(
+    //   new AutoScoreCoral(NetworkTableInstance.getDefault().getTable("Scoring Location").getIntegerTopic("Row").subscribe(0))
+    // );
   }
 
   public Command getAutonomousCommand() {
