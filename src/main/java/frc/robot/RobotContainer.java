@@ -20,8 +20,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
-import frc.robot.Commands.AutoScoreCoral;
-import frc.robot.Commands.DriveToPose;
+import frc.robot.Factories.AutoScoreCoralFactory;
 import frc.robot.RobotState.DriveState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.ElevatorPivot;
@@ -30,15 +29,15 @@ import frc.robot.commons.GremlinLogger;
 import frc.robot.commons.GremlinPS4Controller;
 
 public class RobotContainer {
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+  private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+  private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+  /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+          .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   public static final RobotState M_ROBOT_STATE = RobotState.getRobotState();
 
@@ -56,6 +55,7 @@ public class RobotContainer {
   public final Trigger intakeState = new Trigger(() -> M_ROBOT_STATE.getDriveState() == DriveState.INTAKE);
   public final Trigger teleopState = new Trigger(() -> M_ROBOT_STATE.getDriveState() == DriveState.TELEOP);
 
+  private final AutoScoreCoralFactory autoScoreCoralFactory = new AutoScoreCoralFactory();
 
   public RobotContainer() {
     GremlinLogger.setOptions(new DogLogOptions()
@@ -86,9 +86,9 @@ public class RobotContainer {
       )
     );
 
-    // joystick.L2().onTrue(
-    //   new AutoScoreCoral(NetworkTableInstance.getDefault().getTable("Scoring Location").getIntegerTopic("Row").subscribe(0))
-    // );
+    joystick.L2().onTrue(
+      autoScoreCoralFactory.fullAutoscore()
+    );
   }
 
   public Command getAutonomousCommand() {
