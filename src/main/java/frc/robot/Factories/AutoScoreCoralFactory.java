@@ -8,9 +8,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.Commands.DriveToPose;
 import frc.robot.Subsystems.Claw;
 import frc.robot.Subsystems.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.ElevatorPivot;
+import frc.robot.commons.Translation2DUtils;
+
 import static frc.robot.Constants.AutoScoreConstants.*;
 
 public class AutoScoreCoralFactory {
@@ -21,6 +24,24 @@ public class AutoScoreCoralFactory {
 
     private Translation2d midpoint(Translation2d a, Translation2d b) {
         return new Translation2d(a.getX() + (b.getX() - a.getX())/2, a.getY() + (b.getY() - a.getY())/2);
+    }
+
+    private Command pathfindWithOffset(Pose2d pos, Translation2d offset) {
+        return new DriveToPose(drivetrain, new Pose2d(pos.getTranslation().minus(offset), pos.getRotation()));
+    }
+
+    private Command pathfindDistance(Pose2d pos, double dist) {
+        Translation2d reefCenter;
+        if (DriverStation.getAlliance().get() == Alliance.Red) {
+            reefCenter = REEF_CENTERS[0];
+        } else {
+            reefCenter = REEF_CENTERS[1];
+        }
+
+        Translation2d vector = reefCenter.minus(pos.getTranslation());
+        vector = Translation2DUtils.normalize(vector);
+        vector.times(dist);
+        return pathfindWithOffset(pos, vector);
     }
 
     private Pose2d getRobotPose() {
@@ -59,5 +80,32 @@ public class AutoScoreCoralFactory {
         }
         }
         return new Pose2d(closest, new Rotation2d(ROTATIONS[idx]));
+    }
+
+    public Command goToScoreHeightAndDriveForwad() {
+        long poleNum = poleHeightSubscriber.get();
+        double height = SCORE_HEIGHTS[(int) poleNum];
+        double rot = SCORE_ANGLES[(int) poleNum];
+        return elevatorPivot.goToPosition(() -> {return height;}, () -> {return rot;}).andThen(pathfindDistance(getRobotPose(), FRONT_DIST));
+    }
+
+    private Command stow() {
+        return elevatorPivot.stowArm();
+    }
+
+    public Command reset() {
+        return pathfindDistance(getRobotPose(), BACKUP_DIST).andThen(stow());
+    }
+
+    public Command goToScorePos() {
+        return new DriveToPose(drivetrain, getAutoscorePose());
+    }
+
+    public Command score() {
+        return claw.outtakeGeneric();
+    }
+
+    public Command fullAutoscore() {
+        return goToScorePos().andThen(goToScoreHeightAndDriveForwad()).andThen(score()).andThen(reset());
     }
 }

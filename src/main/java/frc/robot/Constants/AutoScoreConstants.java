@@ -61,4 +61,5 @@ public class AutoScoreConstants {
     };
 
     public static double BACKUP_DIST = 1;
+    public static double FRONT_DIST = 1;
 }
