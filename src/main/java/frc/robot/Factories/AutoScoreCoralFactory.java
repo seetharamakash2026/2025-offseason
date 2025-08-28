@@ -32,10 +32,14 @@ public class AutoScoreCoralFactory {
 
     private Command pathfindDistance(Pose2d pos, double dist) {
         Translation2d reefCenter;
-        if (DriverStation.getAlliance().get() == Alliance.Red) {
+        if (DriverStation.getAlliance().isPresent()) {
+            if (DriverStation.getAlliance().get() == Alliance.Red) {
+                reefCenter = REEF_CENTERS[0];
+            } else {
+                reefCenter = REEF_CENTERS[1];
+            }
+        } else { //Default to red
             reefCenter = REEF_CENTERS[0];
-        } else {
-            reefCenter = REEF_CENTERS[1];
         }
 
         Translation2d vector = reefCenter.minus(pos.getTranslation());
@@ -52,24 +56,35 @@ public class AutoScoreCoralFactory {
         Translation2d[] midpoints;
 
         //Alliance
-        if (DriverStation.getAlliance().get() == Alliance.Red) {
-        midpoints = new Translation2d[]{
-            midpoint(POLEPOSESRED[0], POLEPOSESRED[1]),
-            midpoint(POLEPOSESRED[2], POLEPOSESRED[3]),
-            midpoint(POLEPOSESRED[4], POLEPOSESRED[5]),
-            midpoint(POLEPOSESRED[6], POLEPOSESRED[7]),
-            midpoint(POLEPOSESRED[8], POLEPOSESRED[9]),
-            midpoint(POLEPOSESRED[10], POLEPOSESRED[11])
-        };
-        } else {
-        midpoints = new Translation2d[]{
-            midpoint(POLEPOSESBLUE[0], POLEPOSESBLUE[1]),
-            midpoint(POLEPOSESBLUE[2], POLEPOSESBLUE[3]),
-            midpoint(POLEPOSESBLUE[4], POLEPOSESBLUE[5]),
-            midpoint(POLEPOSESBLUE[6], POLEPOSESBLUE[7]),
-            midpoint(POLEPOSESBLUE[8], POLEPOSESBLUE[9]),
-            midpoint(POLEPOSESBLUE[10], POLEPOSESBLUE[11])
-        };
+        if (DriverStation.getAlliance().isPresent()) {
+            if (DriverStation.getAlliance().get() == Alliance.Red) {
+                midpoints = new Translation2d[]{
+                    midpoint(POLEPOSESRED[0], POLEPOSESRED[1]),
+                    midpoint(POLEPOSESRED[2], POLEPOSESRED[3]),
+                    midpoint(POLEPOSESRED[4], POLEPOSESRED[5]),
+                    midpoint(POLEPOSESRED[6], POLEPOSESRED[7]),
+                    midpoint(POLEPOSESRED[8], POLEPOSESRED[9]),
+                    midpoint(POLEPOSESRED[10], POLEPOSESRED[11])
+                };
+            } else {
+                midpoints = new Translation2d[]{
+                    midpoint(POLEPOSESBLUE[0], POLEPOSESBLUE[1]),
+                    midpoint(POLEPOSESBLUE[2], POLEPOSESBLUE[3]),
+                    midpoint(POLEPOSESBLUE[4], POLEPOSESBLUE[5]),
+                    midpoint(POLEPOSESBLUE[6], POLEPOSESBLUE[7]),
+                    midpoint(POLEPOSESBLUE[8], POLEPOSESBLUE[9]),
+                    midpoint(POLEPOSESBLUE[10], POLEPOSESBLUE[11])
+                };
+            }
+        } else { //Default to red
+            midpoints = new Translation2d[]{
+                midpoint(POLEPOSESRED[0], POLEPOSESRED[1]),
+                midpoint(POLEPOSESRED[2], POLEPOSESRED[3]),
+                midpoint(POLEPOSESRED[4], POLEPOSESRED[5]),
+                midpoint(POLEPOSESRED[6], POLEPOSESRED[7]),
+                midpoint(POLEPOSESRED[8], POLEPOSESRED[9]),
+                midpoint(POLEPOSESRED[10], POLEPOSESRED[11])
+            };
         }
         Translation2d closest = midpoints[0];
         int idx = 0;
@@ -83,7 +98,8 @@ public class AutoScoreCoralFactory {
     }
 
     public Command goToScoreHeightAndDriveForwad() {
-        long poleNum = poleHeightSubscriber.get();
+        // long poleNum = poleHeightSubscriber.get();
+        long poleNum = 1;
         double height = SCORE_HEIGHTS[(int) poleNum];
         double rot = SCORE_ANGLES[(int) poleNum];
         return elevatorPivot.goToPosition(() -> {return height;}, () -> {return rot;}).andThen(pathfindDistance(getRobotPose(), FRONT_DIST));
