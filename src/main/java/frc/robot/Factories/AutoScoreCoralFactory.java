@@ -110,7 +110,7 @@ public class AutoScoreCoralFactory {
     }
 
     public Command reset() {
-        return pathfindDistance(getRobotPose(), BACKUP_DIST).andThen(stow());
+        return pathfindDistance(getRobotPose(), -BACKUP_DIST).andThen(stow());
     }
 
     public Command goToScorePos() {

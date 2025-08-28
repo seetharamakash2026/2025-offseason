@@ -1,7 +1,5 @@
 package frc.robot.Constants;
 
-import org.dyn4j.geometry.Rotation;
-
 import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -38,7 +36,7 @@ public class AutoScoreConstants {
         FlippingUtil.flipFieldPose(new Pose2d(POLEPOSESRED[10], Rotation2d.kZero)).getTranslation(),
         FlippingUtil.flipFieldPose(new Pose2d(POLEPOSESRED[11], Rotation2d.kZero)).getTranslation()
     };
-    
+
     public static double[] ROTATIONS = {
         0,
         60,
